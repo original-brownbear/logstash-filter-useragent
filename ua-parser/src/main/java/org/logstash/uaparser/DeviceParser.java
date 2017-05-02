@@ -24,13 +24,12 @@ import java.util.regex.Pattern;
 
 /**
  * Device parser using ua-parser regexes. Extracts device information from user agent strings.
- *
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
 public class DeviceParser {
-    List<DevicePattern> patterns;
+    List<DeviceParser.DevicePattern> patterns;
 
-    public DeviceParser(List<DevicePattern> patterns) {
+    public DeviceParser(List<DeviceParser.DevicePattern> patterns) {
         this.patterns = patterns;
     }
 
@@ -39,7 +38,7 @@ public class DeviceParser {
             return null;
         }
         String device = null;
-        for (DevicePattern p : patterns) {
+        for (DeviceParser.DevicePattern p : patterns) {
             if ((device = p.match(agentString)) != null) {
                 break;
             }
@@ -49,21 +48,21 @@ public class DeviceParser {
     }
 
     public static DeviceParser fromList(List<Map<String, String>> configList) {
-        List<DevicePattern> configPatterns = new ArrayList<DevicePattern>();
+        List<DeviceParser.DevicePattern> configPatterns = new ArrayList<>();
         for (Map<String, String> configMap : configList) {
             configPatterns.add(DeviceParser.patternFromMap(configMap));
         }
         return new DeviceParser(configPatterns);
     }
 
-    protected static DevicePattern patternFromMap(Map<String, String> configMap) {
+    protected static DeviceParser.DevicePattern patternFromMap(Map<String, String> configMap) {
         String regex = configMap.get("regex");
         if (regex == null) {
             throw new IllegalArgumentException("Device is missing regex");
         }
         Pattern pattern = "i".equals(configMap.get("regex_flag")) // no ohter flags used (by now)
             ? Pattern.compile(regex, Pattern.CASE_INSENSITIVE) : Pattern.compile(regex);
-        return new DevicePattern(pattern, configMap.get("device_replacement"));
+        return new DeviceParser.DevicePattern(pattern, configMap.get("device_replacement"));
     }
 
     protected static class DevicePattern {
@@ -77,15 +76,15 @@ public class DeviceParser {
         }
 
         public String match(String agentString) {
-            Matcher matcher = pattern.matcher(agentString);
+            Matcher matcher = this.pattern.matcher(agentString);
             if (!matcher.find()) {
                 return null;
             }
             String device = null;
-            if (deviceReplacement != null) {
-                if (deviceReplacement.contains("$")) {
-                    device = deviceReplacement;
-                    for (String substitution : getSubstitutions(deviceReplacement)) {
+            if (this.deviceReplacement != null) {
+                if (this.deviceReplacement.contains("$")) {
+                    device = this.deviceReplacement;
+                    for (String substitution : getSubstitutions(this.deviceReplacement)) {
                         int i = Integer.valueOf(substitution.substring(1));
                         String replacement = matcher.groupCount() >= i && matcher.group(i) != null
                             ? Matcher.quoteReplacement(matcher.group(i)) : "";
@@ -93,7 +92,7 @@ public class DeviceParser {
                     }
                     device = device.trim();
                 } else {
-                    device = deviceReplacement;
+                    device = this.deviceReplacement;
                 }
             } else if (matcher.groupCount() >= 1) {
                 device = matcher.group(1);
@@ -102,8 +101,9 @@ public class DeviceParser {
         }
 
         private List<String> getSubstitutions(String deviceReplacement) {
-            Matcher matcher = SUBSTITUTIONS_PATTERN.matcher(deviceReplacement);
-            List<String> substitutions = new ArrayList<String>();
+            Matcher matcher =
+                DeviceParser.DevicePattern.SUBSTITUTIONS_PATTERN.matcher(deviceReplacement);
+            List<String> substitutions = new ArrayList<>();
             while (matcher.find()) {
                 substitutions.add(matcher.group());
             }
