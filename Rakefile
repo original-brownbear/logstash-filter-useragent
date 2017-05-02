@@ -17,5 +17,5 @@ task :install_jars do
   ENV['JARS_HOME'] = Dir.pwd + "/vendor/jar-dependencies/runtime-jars"
   ENV['JARS_VENDOR'] = "false"
   `cd ua-parser && mvn clean install -DskipTests && cd ..`
-  Jars::Installer.new.vendor_jars!(false)
+  Jars::Installer.new.vendor_jars!(false, ENV['JARS_HOME'])
 end
