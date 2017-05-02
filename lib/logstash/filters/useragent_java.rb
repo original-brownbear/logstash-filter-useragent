@@ -122,7 +122,7 @@ class LogStash::Filters::UserAgentJava < LogStash::Filters::Base
   def set_fields(event, ua_data)
     # UserAgentParser outputs as US-ASCII.
 
-    event.set(@prefixed_name, ua_data.name.dup.force_encoding(Encoding::UTF_8))
+    event.set(@prefixed_name, ua_data.userAgent.family.dup.force_encoding(Encoding::UTF_8))
 
     #OSX, Android and maybe iOS parse correctly, ua-agent parsing for Windows does not provide this level of detail
 
@@ -131,18 +131,18 @@ class LogStash::Filters::UserAgentJava < LogStash::Filters::Base
     if (os = ua_data.os)
       # The OS is a rich object
       event.set(@prefixed_os, ua_data.os.to_s.dup.force_encoding(Encoding::UTF_8))
-      event.set(@prefixed_os_name, os.name.dup.force_encoding(Encoding::UTF_8)) if os.name
+      event.set(@prefixed_os_name, os.family.dup.force_encoding(Encoding::UTF_8)) if os.family
 
       # These are all strings
-      if (os_version = os.version)
-        event.set(@prefixed_os_major, os_version.major.dup.force_encoding(Encoding::UTF_8)) if os_version.major
-        event.set(@prefixed_os_minor, os_version.minor.dup.force_encoding(Encoding::UTF_8)) if os_version.minor
+      if (os.minor && os.major)
+        event.set(@prefixed_os_major, os.major.dup.force_encoding(Encoding::UTF_8)) if os.major
+        event.set(@prefixed_os_minor, os.minor.dup.force_encoding(Encoding::UTF_8)) if os.minor
       end
     end
 
     event.set(@prefixed_device, ua_data.device.to_s.dup.force_encoding(Encoding::UTF_8)) if ua_data.device
 
-    if (ua_version = ua_data.version)
+    if (ua_version = ua_data.userAgent)
       event.set(@prefixed_major, ua_version.major.dup.force_encoding(Encoding::UTF_8)) if ua_version.major
       event.set(@prefixed_minor, ua_version.minor.dup.force_encoding(Encoding::UTF_8)) if ua_version.minor
       event.set(@prefixed_patch, ua_version.patch.dup.force_encoding(Encoding::UTF_8)) if ua_version.patch
