@@ -14,7 +14,7 @@
     <resources>
       <resource>
         <targetPath>ua_parser</targetPath>
-        <directory>${basedir}/../uap-core</directory>
+        <directory>${basedir}/src/main/resources</directory>
         <includes>
           <include>regexes.yaml</include>
         </includes>
