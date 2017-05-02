@@ -2,7 +2,6 @@ package ua_parser;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,9 +15,10 @@ import org.junit.Test;
  */
 public class CachingParserTest extends ParserTest {
 
+  @Override
   @Before
   public void initParser() throws Exception {
-    parser = new CachingParser();
+    this.parser = new CachingParser();
   }
 
   @Override
@@ -30,58 +30,58 @@ public class CachingParserTest extends ParserTest {
 
   @Test
   public void testCachedParseUserAgent() {
-    super.testParseUserAgent();
-    super.testParseUserAgent();
-    super.testParseUserAgent();
+    testParseUserAgent();
+    testParseUserAgent();
+    testParseUserAgent();
   }
 
   @Test
-  public void testCachedParseOS() {
-    super.testParseOS();
-    super.testParseOS();
-    super.testParseOS();
+  public void testCachedParseOS() throws Exception {
+    testParseOS();
+    testParseOS();
+    testParseOS();
   }
 
   @Test
-  public void testCachedParseAdditionalOS() {
-    super.testParseAdditionalOS();
-    super.testParseAdditionalOS();
-    super.testParseAdditionalOS();
+  public void testCachedParseAdditionalOS() throws Exception {
+    testParseAdditionalOS();
+    testParseAdditionalOS();
+    testParseAdditionalOS();
   }
 
   @Test
-  public void testCachedParseDevice() {
-    super.testParseDevice();
-    super.testParseDevice();
-    super.testParseDevice();
+  public void testCachedParseDevice() throws Exception {
+    testParseDevice();
+    testParseDevice();
+    testParseDevice();
   }
 
   @Test
   public void testCachedParseFirefox() {
-    super.testParseFirefox();
-    super.testParseFirefox();
-    super.testParseFirefox();
+    testParseFirefox();
+    testParseFirefox();
+    testParseFirefox();
   }
 
   @Test
   public void testCachedParsePGTS() {
-    super.testParsePGTS();
-    super.testParsePGTS();
-    super.testParsePGTS();
+    testParsePGTS();
+    testParsePGTS();
+    testParsePGTS();
   }
 
   @Test
   public void testCachedParseAll() {
-    super.testParseAll();
-    super.testParseAll();
-    super.testParseAll();
+    testParseAll();
+    testParseAll();
+    testParseAll();
   }
 
   @Test
   public void testCachedReplacementQuoting() throws Exception {
-    super.testReplacementQuoting();
-    super.testReplacementQuoting();
-    super.testReplacementQuoting();
+    testReplacementQuoting();
+    testReplacementQuoting();
+    testReplacementQuoting();
   }
 
 }

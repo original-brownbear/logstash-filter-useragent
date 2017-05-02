@@ -18,13 +18,12 @@ package ua_parser;
 
 import java.util.HashSet;
 import java.util.Random;
-
-import org.junit.Test;
 import org.junit.Before;
-import org.yaml.snakeyaml.Yaml;
+import org.junit.Test;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 
 /**
  * Abstract base class for the data class tests

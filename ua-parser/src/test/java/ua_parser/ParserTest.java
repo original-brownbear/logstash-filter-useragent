@@ -17,6 +17,7 @@
 package ua_parser;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -49,18 +50,17 @@ public class ParserTest {
   }
 
   @Test
-  public void testParseOS() {
+  public void testParseOS() throws Exception {
     testOSFromYaml("test_os.yaml");
   }
 
   @Test
-  public void testParseAdditionalOS() {
+  public void testParseAdditionalOS() throws Exception {
     testOSFromYaml("additional_os_tests.yaml");
   }
 
-
   @Test
-  public void testParseDevice() {
+  public void testParseDevice() throws Exception {
     testDeviceFromYaml("test_device.yaml");
   }
 
@@ -76,13 +76,13 @@ public class ParserTest {
 
   @Test
   public void testParseAll() {
-    String agentString1 = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; fr; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5,gzip(gfe),gzip(gfe)";
-    String agentString2 = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_1_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B206 Safari/7534.48.3";
+    final String agentString1 = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; fr; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5,gzip(gfe),gzip(gfe)";
+    final String agentString2 = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_1_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B206 Safari/7534.48.3";
 
-    Client expected1 = new Client(new UserAgent("Firefox", "3", "5", "5"),
+    final Client expected1 = new Client(new UserAgent("Firefox", "3", "5", "5"),
                                   new OS("Mac OS X", "10", "4", null, null),
                                   new Device("Other"));
-    Client expected2 = new Client(new UserAgent("Mobile Safari", "5", "1", null),
+    final Client expected2 = new Client(new UserAgent("Mobile Safari", "5", "1", null),
                                   new OS("iOS", "5", "1", "1", null),
                                   new Device("iPhone"));
 
@@ -92,7 +92,7 @@ public class ParserTest {
 
   @Test
   public void testReplacementQuoting() throws Exception {
-    String testConfig = "user_agent_parsers:\n"
+    final String testConfig = "user_agent_parsers:\n"
                       + "  - regex: 'ABC([\\\\0-9]+)'\n"
                       + "    family_replacement: 'ABC ($1)'\n"
                       + "os_parsers:\n"
@@ -102,8 +102,8 @@ public class ParserTest {
                       + "  - regex: 'CashPhone-([\\$0-9]+)\\.(\\d+)\\.(\\d+)'\n"
                       + "    device_replacement: 'CashPhone $1'\n";
 
-    Parser testParser = parserFromStringConfig(testConfig);
-    Client result = testParser.parse("ABC12\\34 (CashPhone-$9.0.1 CatOS OH-HAI=/^.^\\=)");
+    final Parser testParser = parserFromStringConfig(testConfig);
+    final Client result = testParser.parse("ABC12\\34 (CashPhone-$9.0.1 CatOS OH-HAI=/^.^\\=)");
     assertThat(result.userAgent.family, is("ABC (12\\34)"));
     assertThat(result.os.family, is("CatOS 9000"));
     assertThat(result.device.family, is("CashPhone $9"));
@@ -114,45 +114,47 @@ public class ParserTest {
     parserFromStringConfig("user_agent_parsers:\n  - family_replacement: 'a'");
   }
 
-  void testUserAgentFromYaml(String filename) {
-    InputStream yamlStream = this.getClass().getResourceAsStream(TEST_RESOURCE_PATH + filename);
+  void testUserAgentFromYaml(final String filename) {
+    final InputStream yamlStream = this.getClass().getResourceAsStream(TEST_RESOURCE_PATH + filename);
 
-    List<Map> testCases = (List<Map>) ((Map)yaml.load(yamlStream)).get("test_cases");
-    for(Map<String, String> testCase : testCases) {
+    final List<Map> testCases = (List<Map>) ((Map)yaml.load(yamlStream)).get("test_cases");
+    for(final Map<String, String> testCase : testCases) {
       // Skip tests with js_ua as those overrides are not yet supported in java
       if (testCase.containsKey("js_ua")) continue;
 
-      String uaString = testCase.get("user_agent_string");
+      final String uaString = testCase.get("user_agent_string");
       assertThat(uaString, parser.parseUserAgent(uaString), is(UserAgent.fromMap(testCase)));
     }
   }
 
-  void testOSFromYaml(String filename) {
-    InputStream yamlStream = this.getClass().getResourceAsStream(TEST_RESOURCE_PATH + filename);
-
-    List<Map> testCases = (List<Map>) ((Map)yaml.load(yamlStream)).get("test_cases");
-    for(Map<String, String> testCase : testCases) {
-      // Skip tests with js_ua as those overrides are not yet supported in java
-      if (testCase.containsKey("js_ua")) continue;
-
-      String uaString = testCase.get("user_agent_string");
-      assertThat(uaString, parser.parseOS(uaString), is(OS.fromMap(testCase)));
+  void testOSFromYaml(final String filename) throws IOException {
+    final List<Map> testCases;
+    try (InputStream yamlStream = this.getClass()
+        .getResourceAsStream(TEST_RESOURCE_PATH + filename)) {
+      testCases = (List<Map>) ((Map) yaml.load(yamlStream)).get("test_cases");
+      for (final Map<String, String> testCase : testCases) {
+        // Skip tests with js_ua as those overrides are not yet supported in java
+        if (testCase.containsKey("js_ua")) continue;
+        final String uaString = testCase.get("user_agent_string");
+        assertThat(uaString, parser.parseOS(uaString), is(OS.fromMap(testCase)));
+      }
     }
   }
 
-  void testDeviceFromYaml(String filename) {
-    InputStream yamlStream = this.getClass().getResourceAsStream(TEST_RESOURCE_PATH + filename);
-
-    List<Map> testCases = (List<Map>) ((Map)yaml.load(yamlStream)).get("test_cases");
-    for(Map<String, String> testCase : testCases) {
-
-      String uaString = testCase.get("user_agent_string");
-      assertThat(uaString, parser.parseDevice(uaString), is(Device.fromMap(testCase)));
+  void testDeviceFromYaml(final String filename) throws IOException {
+    final List<Map> testCases;
+    try (InputStream yamlStream = this.getClass()
+        .getResourceAsStream(TEST_RESOURCE_PATH + filename)) {
+      testCases = (List<Map>) ((Map) yaml.load(yamlStream)).get("test_cases");
+      for (final Map<String, String> testCase : testCases) {
+        final String uaString = testCase.get("user_agent_string");
+        assertThat(uaString, parser.parseDevice(uaString), is(Device.fromMap(testCase)));
+      }
     }
   }
 
-  Parser parserFromStringConfig(String configYamlAsString) throws Exception {
-    InputStream yamlInput = new ByteArrayInputStream(configYamlAsString.getBytes("UTF8"));
+  Parser parserFromStringConfig(final String configYamlAsString) throws Exception {
+    final InputStream yamlInput = new ByteArrayInputStream(configYamlAsString.getBytes("UTF8"));
     return new Parser(yamlInput);
   }
 }
