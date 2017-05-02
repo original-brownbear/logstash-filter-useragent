@@ -19,3 +19,5 @@ task :install_jars do
   `cd ua-parser && mvn clean install -DskipTests && cd ..`
   Jars::Installer.new.vendor_jars!(false, ENV['JARS_HOME'])
 end
+
+task :vendor => :install_jars

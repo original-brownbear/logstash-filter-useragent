@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors         = ["Elastic"]
   s.email           = 'info@elastic.co'
   s.homepage        = "http://www.elastic.co/guide/en/logstash/current/index.html"
-  s.require_paths = ["lib", Dir.pwd + "/vendor/jar-dependencies/runtime-jars"]
+  s.require_paths   = ["lib", Dir.pwd + "/vendor/jar-dependencies/runtime-jars"]
 
   # Files
   s.files = Dir["lib/**/*","spec/**/*","*.gemspec","*.md","CONTRIBUTORS","Gemfile","LICENSE","NOTICE.TXT", "vendor/jar-dependencies/**/*.jar", "/vendor/jar-dependencies/runtime-jars/*.jar", "vendor/jar-dependencies/**/*.rb", "VERSION", "docs/**/*"]
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'user_agent_parser', ['>= 2.0.0']
   s.add_runtime_dependency 'lru_redux', "~> 1.1.0"
   s.add_development_dependency 'logstash-devutils'
-  s.add_development_dependency 'jar-dependencies', '~> 0.3.2'
+  s.add_development_dependency 'jar-dependencies', '~> 0.3.11'
 
   s.requirements << "jar 'org.logstash:logstash-filter-useragent-parser', '#{s.version}-SNAPSHOT'"
 end

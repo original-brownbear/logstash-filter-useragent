@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "java"
+require "logstash-filter-useragent_jars"
 require "logstash/filters/base"
 require "logstash/namespace"
 require "lru_redux"
