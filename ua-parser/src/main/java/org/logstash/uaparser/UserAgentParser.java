@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 
 /**
  * User Agent parser using ua-parser regexes
- *
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
 public class UserAgentParser {
@@ -35,7 +34,7 @@ public class UserAgentParser {
     }
 
     public static UserAgentParser fromList(List<Map<String, String>> configList) {
-        List<UserAgentParser.UAPattern> configPatterns = new ArrayList<UserAgentParser.UAPattern>();
+        List<UserAgentParser.UAPattern> configPatterns = new ArrayList<>();
         for (Map<String, String> configMap : configList) {
             configPatterns.add(UserAgentParser.patternFromMap(configMap));
         }
