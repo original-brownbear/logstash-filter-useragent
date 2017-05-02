@@ -1,16 +1,8 @@
 package ua_parser;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
 import org.apache.commons.collections.map.LRUMap;
-
-import ua_parser.Client;
-import ua_parser.Device;
-import ua_parser.OS;
-import ua_parser.Parser;
-import ua_parser.UserAgent;
 
 /**
  * When doing webanalytics (with for example PIG) the main pattern is to process
@@ -21,111 +13,102 @@ import ua_parser.UserAgent;
  *
  * This class introduces a very simple LRU cache to reduce the number of times
  * the parsing is actually done.
- *
  * @author Niels Basjes
- *
  */
-public class CachingParser extends Parser {
+public final class CachingParser extends Parser {
 
-  // TODO: Make configurable
-  private static final int       CACHE_SIZE     = 1000;
+    // TODO: Make configurable
+    private static final int CACHE_SIZE = 1000;
 
-  private Map<String, Client>    cacheClient    = null;
-  private Map<String, UserAgent> cacheUserAgent = null;
-  private Map<String, Device>    cacheDevice    = null;
-  private Map<String, OS>        cacheOS        = null;
+    private Map<String, Client> cacheClient;
+    private Map<String, UserAgent> cacheUserAgent;
+    private Map<String, Device> cacheDevice;
+    private Map<String, OS> cacheOS;
+    // ------------------------------------------
 
-  // ------------------------------------------
-
-  public CachingParser() throws IOException {
-    super();
-  }
-
-  public CachingParser(InputStream regexYaml) {
-    super(regexYaml);
-  }
-
-  // ------------------------------------------
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Client parse(String agentString) {
-    if (agentString == null) {
-      return null;
-    }
-    if (cacheClient == null) {
-      cacheClient = new LRUMap(CACHE_SIZE);
-    }
-    Client client = cacheClient.get(agentString);
-    if (client != null) {
-      return client;
-    }
-    client = super.parse(agentString);
-    cacheClient.put(agentString, client);
-    return client;
-  }
-
-  // ------------------------------------------
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public UserAgent parseUserAgent(String agentString) {
-    if (agentString == null) {
-      return null;
-    }
-    if (cacheUserAgent == null) {
-      cacheUserAgent = new LRUMap(CACHE_SIZE);
-    }
-    UserAgent userAgent = cacheUserAgent.get(agentString);
-    if (userAgent != null) {
-      return userAgent;
-    }
-    userAgent = super.parseUserAgent(agentString);
-    cacheUserAgent.put(agentString, userAgent);
-    return userAgent;
-  }
-
-  // ------------------------------------------
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Device parseDevice(String agentString) {
-    if (agentString == null) {
-      return null;
-    }
-    if (cacheDevice == null) {
-      cacheDevice = new LRUMap(CACHE_SIZE);
-    }
-    Device device = cacheDevice.get(agentString);
-    if (device != null) {
-      return device;
-    }
-    device = super.parseDevice(agentString);
-    cacheDevice.put(agentString, device);
-    return device;
-  }
-
-  // ------------------------------------------
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public OS parseOS(String agentString) {
-    if (agentString == null) {
-      return null;
+    public CachingParser() {
+        super();
     }
 
-    if (cacheOS == null) {
-      cacheOS = new LRUMap(CACHE_SIZE);
+    public CachingParser(InputStream regexYaml) {
+        super(regexYaml);
     }
-    OS os = cacheOS.get(agentString);
-    if (os != null) {
-      return os;
-    }
-    os = super.parseOS(agentString);
-    cacheOS.put(agentString, os);
-    return os;
-  }
+    // ------------------------------------------
 
-  // ------------------------------------------
+    @SuppressWarnings("unchecked")
+    @Override
+    public Client parse(String agentString) {
+        if (agentString == null) {
+            return null;
+        }
+        if (this.cacheClient == null) {
+            this.cacheClient = new LRUMap(CachingParser.CACHE_SIZE);
+        }
+        Client client = this.cacheClient.get(agentString);
+        if (client != null) {
+            return client;
+        }
+        client = super.parse(agentString);
+        this.cacheClient.put(agentString, client);
+        return client;
+    }
+    // ------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public UserAgent parseUserAgent(String agentString) {
+        if (agentString == null) {
+            return null;
+        }
+        if (this.cacheUserAgent == null) {
+            this.cacheUserAgent = new LRUMap(CachingParser.CACHE_SIZE);
+        }
+        UserAgent userAgent = this.cacheUserAgent.get(agentString);
+        if (userAgent != null) {
+            return userAgent;
+        }
+        userAgent = super.parseUserAgent(agentString);
+        this.cacheUserAgent.put(agentString, userAgent);
+        return userAgent;
+    }
+    // ------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Device parseDevice(String agentString) {
+        if (agentString == null) {
+            return null;
+        }
+        if (this.cacheDevice == null) {
+            this.cacheDevice = new LRUMap(CachingParser.CACHE_SIZE);
+        }
+        Device device = this.cacheDevice.get(agentString);
+        if (device != null) {
+            return device;
+        }
+        device = super.parseDevice(agentString);
+        this.cacheDevice.put(agentString, device);
+        return device;
+    }
+    // ------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public OS parseOS(String agentString) {
+        if (agentString == null) {
+            return null;
+        }
+        if (this.cacheOS == null) {
+            this.cacheOS = new LRUMap(CachingParser.CACHE_SIZE);
+        }
+        OS os = this.cacheOS.get(agentString);
+        if (os != null) {
+            return os;
+        }
+        os = super.parseOS(agentString);
+        this.cacheOS.put(agentString, os);
+        return os;
+    }
+    // ------------------------------------------
 
 }
