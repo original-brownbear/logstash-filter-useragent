@@ -62,7 +62,7 @@ describe LogStash::Filters::UserAgentJava do
 
   describe "LRU object identity" do
     let(:ua_string) { "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36" }
-    let(:uafilter) { LogStash::Filters::UserAgent.new("source" => "foo") }
+    let(:uafilter) { LogStash::Filters::UserAgentJava.new("source" => "foo") }
     let(:ua_data) { uafilter.lookup_useragent(ua_string) }
 
     subject(:target) { LogStash::Event.new("foo" => ua_string) }

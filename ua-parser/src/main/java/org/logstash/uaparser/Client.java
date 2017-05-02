@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.logstash.uaparser;
+package org.logstash.uaparser;
 
 /**
  * Collection of parsed data for a given user agent string consisting of UserAgent, OS, Device

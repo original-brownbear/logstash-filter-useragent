@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.logstash.uaparser;
+package org.logstash.uaparser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

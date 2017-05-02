@@ -1,4 +1,4 @@
-package com.logstash.uaparser;
+package org.logstash.uaparser;
 
 /**
  * @author sojern

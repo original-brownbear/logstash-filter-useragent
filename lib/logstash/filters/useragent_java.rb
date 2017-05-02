@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "java"
 require "logstash/filters/base"
 require "logstash/namespace"
 require "lru_redux"
@@ -55,22 +56,16 @@ class LogStash::Filters::UserAgentJava < LogStash::Filters::Base
   config :lru_cache_size, :validate => :number, :default => 1000
 
   def register
-    require 'user_agent_parser'
 
     if @regexes.nil?
-      begin
-        @parser = UserAgentParser::Parser.new
-      rescue Exception => _
-        begin
-          path = ::File.expand_path('../../../vendor/regexes.yaml', ::File.dirname(__FILE__))
-          @parser = UserAgentParser::Parser.new(:patterns_path => path)
-        rescue => ex
-          raise("Failed to cache, due to: #{ex}\n")
-        end
-      end
+      @parser = org.logstash.uaparser.CachingParser.new
     else
       @logger.debug("Using user agent regexes", :regexes => @regexes)
-      @parser = com.logstash.uaparser.CachingParser.new
+      @parser = org.logstash.uaparser.CachingParser.new(
+        java.io.ByteArrayInputStream.new(java.nio.file.Files.read_all_bytes(
+          ::File.expand_path('../../../vendor/regexes.yaml', ::File.dirname(__FILE__))
+        ))
+      )
     end
 
     # make @target in the format [field name] if defined, i.e. surrounded by brakets

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.logstash.uaparser;
+package org.logstash.uaparser;
 
 import java.io.InputStream;
 import java.util.List;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.logstash.uaparser;
+package org.logstash.uaparser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

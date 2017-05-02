@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.logstash.uaparser;
+package org.logstash.uaparser;
 
 /**
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
