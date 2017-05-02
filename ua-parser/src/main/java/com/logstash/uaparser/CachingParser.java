@@ -1,4 +1,4 @@
-package ua_parser;
+package com.logstash.uaparser;
 
 import java.io.InputStream;
 import java.util.Map;

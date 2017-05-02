@@ -13,7 +13,7 @@ require "thread"
 # Logstash releases ship with the regexes.yaml database made available from
 # ua-parser with an Apache 2.0 license. For more details on ua-parser, see
 # <https://github.com/tobie/ua-parser/>.
-class LogStash::Filters::UserAgent < LogStash::Filters::Base
+class LogStash::Filters::UserAgentJava < LogStash::Filters::Base
 
   config_name "useragent"
 
@@ -70,7 +70,7 @@ class LogStash::Filters::UserAgent < LogStash::Filters::Base
       end
     else
       @logger.debug("Using user agent regexes", :regexes => @regexes)
-      @parser = UserAgentParser::Parser.new(:patterns_path => @regexes)
+      @parser = com.logstash.uaparser.CachingParser.new
     end
 
     # make @target in the format [field name] if defined, i.e. surrounded by brakets

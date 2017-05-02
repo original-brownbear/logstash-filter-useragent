@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ua_parser;
+package com.logstash.uaparser;
 
 import java.util.HashSet;
 import java.util.Random;
