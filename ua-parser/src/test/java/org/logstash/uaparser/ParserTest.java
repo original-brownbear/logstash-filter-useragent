@@ -81,10 +81,10 @@ public class ParserTest {
 
     final Client expected1 = new Client(new UserAgent("Firefox", "3", "5", "5"),
                                   new OS("Mac OS X", "10", "4", null, null),
-                                  new Device("Other"));
+                                  "Other");
     final Client expected2 = new Client(new UserAgent("Mobile Safari", "5", "1", null),
                                   new OS("iOS", "5", "1", "1", null),
-                                  new Device("iPhone"));
+                                  "iPhone");
 
     assertThat(parser.parse(agentString1), is(expected1));
     assertThat(parser.parse(agentString2), is(expected2));
@@ -106,7 +106,7 @@ public class ParserTest {
     final Client result = testParser.parse("ABC12\\34 (CashPhone-$9.0.1 CatOS OH-HAI=/^.^\\=)");
     assertThat(result.userAgent.family, is("ABC (12\\34)"));
     assertThat(result.os.family, is("CatOS 9000"));
-    assertThat(result.device.family, is("CashPhone $9"));
+    assertThat(result.device, is("CashPhone $9"));
   }
 
   @Test (expected=IllegalArgumentException.class)

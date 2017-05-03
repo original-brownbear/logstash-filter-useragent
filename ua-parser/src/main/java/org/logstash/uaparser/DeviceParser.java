@@ -46,7 +46,7 @@ final class DeviceParser {
         this.patterns = patterns;
     }
 
-    public Device parse(String agentString) {
+    public String parse(String agentString) {
         if (agentString == null) {
             return null;
         }
@@ -57,7 +57,7 @@ final class DeviceParser {
             }
         }
         if (device == null) device = "Other";
-        return new Device(device);
+        return device;
     }
 
     private static DeviceParser.DevicePattern patternFromMap(Map<String, String> configMap) {
@@ -83,7 +83,7 @@ final class DeviceParser {
             this.deviceReplacement = deviceReplacement;
         }
 
-        public String match(String agentString) {
+        public String match(final CharSequence agentString) {
             this.matcher.reset(agentString);
             if (!this.matcher.find()) {
                 return null;

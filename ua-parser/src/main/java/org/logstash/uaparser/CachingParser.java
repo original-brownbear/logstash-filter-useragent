@@ -18,11 +18,11 @@ import org.apache.commons.collections.map.LRUMap;
 public final class CachingParser extends Parser {
 
     // TODO: Make configurable
-    private static final int CACHE_SIZE = 1000;
+    private static final int CACHE_SIZE = 100_000;
 
     private Map<String, Client> cacheClient;
     private Map<String, UserAgent> cacheUserAgent;
-    private Map<String, Device> cacheDevice;
+    private Map<String, String> cacheDevice;
     private Map<String, OS> cacheOS;
     // ------------------------------------------
 
@@ -75,14 +75,14 @@ public final class CachingParser extends Parser {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Device parseDevice(String agentString) {
+    public String parseDevice(String agentString) {
         if (agentString == null) {
             return null;
         }
         if (this.cacheDevice == null) {
             this.cacheDevice = new LRUMap(CachingParser.CACHE_SIZE);
         }
-        Device device = this.cacheDevice.get(agentString);
+        String device = this.cacheDevice.get(agentString);
         if (device != null) {
             return device;
         }
