@@ -45,7 +45,7 @@ end
 
 puts(Time.now.to_s)
 
-(1..10).each do
+(1..1).each do
   (1..lines.length).each do |n|
     java_filter.lookup_useragent lines[n]
   end

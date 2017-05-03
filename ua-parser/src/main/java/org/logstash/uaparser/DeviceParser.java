@@ -60,7 +60,7 @@ public class DeviceParser {
         if (regex == null) {
             throw new IllegalArgumentException("Device is missing regex");
         }
-        Pattern pattern = "i".equals(configMap.get("regex_flag")) // no ohter flags used (by now)
+        Pattern pattern = "i".equals(configMap.get("regex_flag")) // no other flags used (by now)
             ? Pattern.compile(regex, Pattern.CASE_INSENSITIVE) : Pattern.compile(regex);
         return new DeviceParser.DevicePattern(pattern, configMap.get("device_replacement"));
     }
@@ -85,7 +85,7 @@ public class DeviceParser {
                 if (this.deviceReplacement.contains("$")) {
                     device = this.deviceReplacement;
                     for (String substitution : getSubstitutions(this.deviceReplacement)) {
-                        int i = Integer.valueOf(substitution.substring(1));
+                        int i = Integer.parseInt(substitution.substring(1));
                         String replacement = matcher.groupCount() >= i && matcher.group(i) != null
                             ? Matcher.quoteReplacement(matcher.group(i)) : "";
                         device = device.replaceFirst("\\" + substitution, replacement);

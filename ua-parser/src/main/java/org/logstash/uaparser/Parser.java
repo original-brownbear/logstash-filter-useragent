@@ -24,7 +24,6 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * Java implementation of <a href="https://github.com/tobie/ua-parser">UA Parser</a>
- *
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
 public class Parser {
@@ -35,7 +34,7 @@ public class Parser {
     private DeviceParser deviceParser;
 
     public Parser() {
-        this(Parser.class.getResourceAsStream(REGEX_YAML_PATH));
+        this(Parser.class.getResourceAsStream(Parser.REGEX_YAML_PATH));
     }
 
     public Parser(InputStream regexYaml) {
@@ -43,22 +42,21 @@ public class Parser {
     }
 
     public Client parse(String agentString) {
-        UserAgent ua = parseUserAgent(agentString);
-        OS os = parseOS(agentString);
-        Device device = deviceParser.parse(agentString);
-        return new Client(ua, os, device);
+        return new Client(
+            parseUserAgent(agentString), parseOS(agentString), this.deviceParser.parse(agentString)
+        );
     }
 
     public UserAgent parseUserAgent(String agentString) {
-        return uaParser.parse(agentString);
+        return this.uaParser.parse(agentString);
     }
 
     public Device parseDevice(String agentString) {
-        return deviceParser.parse(agentString);
+        return this.deviceParser.parse(agentString);
     }
 
     public OS parseOS(String agentString) {
-        return osParser.parse(agentString);
+        return this.osParser.parse(agentString);
     }
 
     private void initialize(InputStream regexYaml) {
@@ -70,16 +68,16 @@ public class Parser {
         if (uaParserConfigs == null) {
             throw new IllegalArgumentException("user_agent_parsers is missing from yaml");
         }
-        uaParser = UserAgentParser.fromList(uaParserConfigs);
+        this.uaParser = UserAgentParser.fromList(uaParserConfigs);
         List<Map<String, String>> osParserConfigs = regexConfig.get("os_parsers");
         if (osParserConfigs == null) {
             throw new IllegalArgumentException("os_parsers is missing from yaml");
         }
-        osParser = OSParser.fromList(osParserConfigs);
+        this.osParser = OSParser.fromList(osParserConfigs);
         List<Map<String, String>> deviceParserConfigs = regexConfig.get("device_parsers");
         if (deviceParserConfigs == null) {
             throw new IllegalArgumentException("device_parsers is missing from yaml");
         }
-        deviceParser = DeviceParser.fromList(deviceParserConfigs);
+        this.deviceParser = DeviceParser.fromList(deviceParserConfigs);
     }
 }

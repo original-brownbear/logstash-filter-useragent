@@ -29,7 +29,7 @@ import java.util.Map;
 public class OSParser {
     private final List<OSParser.OSPattern> patterns;
 
-    public OSParser(List<OSParser.OSPattern> patterns) {
+    private OSParser(List<OSParser.OSPattern> patterns) {
         this.patterns = patterns;
     }
 
@@ -41,12 +41,12 @@ public class OSParser {
         return new OSParser(configPatterns);
     }
 
-    public OS parse(String agentString) {
+    public OS parse(final String agentString) {
         if (agentString == null) {
             return null;
         }
-        OS os;
-        for (OSParser.OSPattern p : patterns) {
+        for (OSParser.OSPattern p : this.patterns) {
+            OS os;
             if ((os = p.match(agentString)) != null) {
                 return os;
             }
@@ -59,7 +59,7 @@ public class OSParser {
         if (regex == null) {
             throw new IllegalArgumentException("OS is missing regex");
         }
-        return new OSPattern(
+        return new OSParser.OSPattern(
             Pattern.compile(regex),
             configMap.get("os_replacement"),
             configMap.get("os_v1_replacement"),
@@ -69,8 +69,19 @@ public class OSParser {
     }
 
     protected static class OSPattern {
+
+        private static final Pattern FIRST_PATTERN =
+            Pattern.compile("(" + Pattern.quote("$1") + ")");
+
         private final Pattern pattern;
-        private final String osReplacement, v1Replacement, v2Replacement, v3Replacement;
+
+        private final String osReplacement;
+
+        private final String v1Replacement;
+
+        private final String v2Replacement;
+
+        private final String v3Replacement;
 
         public OSPattern(Pattern pattern, String osReplacement, String v1Replacement,
             String v2Replacement, String v3Replacement) {
@@ -82,16 +93,15 @@ public class OSParser {
         }
 
         public OS match(String agentString) {
-            String family = null, v1 = null, v2 = null, v3 = null, v4 = null;
-            Matcher matcher = this.pattern.matcher(agentString);
+            final Matcher matcher = this.pattern.matcher(agentString);
             if (!matcher.find()) {
                 return null;
             }
-            int groupCount = matcher.groupCount();
+            final int groupCount = matcher.groupCount();
+            String family = null;
             if (this.osReplacement != null) {
                 if (groupCount >= 1) {
-                    family = Pattern.compile("(" + Pattern.quote("$1") + ")")
-                        .matcher(this.osReplacement)
+                    family = OSParser.OSPattern.FIRST_PATTERN.matcher(this.osReplacement)
                         .replaceAll(matcher.group(1));
                 } else {
                     family = this.osReplacement;
@@ -99,21 +109,25 @@ public class OSParser {
             } else if (groupCount >= 1) {
                 family = matcher.group(1);
             }
+            String v1 = null;
             if (this.v1Replacement != null) {
                 v1 = this.v1Replacement;
             } else if (groupCount >= 2) {
                 v1 = matcher.group(2);
             }
+            String v2 = null;
             if (this.v2Replacement != null) {
                 v2 = this.v2Replacement;
             } else if (groupCount >= 3) {
                 v2 = matcher.group(3);
             }
+            String v3 = null;
             if (this.v3Replacement != null) {
                 v3 = this.v3Replacement;
             } else if (groupCount >= 4) {
                 v3 = matcher.group(4);
             }
+            String v4 = null;
             if (groupCount >= 5) {
                 v4 = matcher.group(5);
             }

@@ -44,13 +44,13 @@ public final class CachingParser extends Parser {
         if (this.cacheClient == null) {
             this.cacheClient = new LRUMap(CachingParser.CACHE_SIZE);
         }
-        Client client = this.cacheClient.get(agentString);
+        final Client client = this.cacheClient.get(agentString);
         if (client != null) {
             return client;
         }
-        client = super.parse(agentString);
-        this.cacheClient.put(agentString, client);
-        return client;
+        final Client parsed = super.parse(agentString);
+        this.cacheClient.put(agentString, parsed);
+        return parsed;
     }
     // ------------------------------------------
 

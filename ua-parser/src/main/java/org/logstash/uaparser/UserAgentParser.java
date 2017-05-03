@@ -85,37 +85,37 @@ public class UserAgentParser {
         }
 
         public UserAgent match(final CharSequence agentString) {
-            final Matcher matcher = this.matcher.reset(agentString);
-            if (!matcher.find()) {
+            this.matcher.reset(agentString);
+            if (!this.matcher.find()) {
                 return null;
             }
-            final int groupCount = matcher.groupCount();
+            final int groupCount = this.matcher.groupCount();
             String family = null;
             if (this.familyReplacement != null) {
                 if (this.familyContainsPos && groupCount >= 1 &&
-                    matcher.group(1) != null) {
+                    this.matcher.group(1) != null) {
                     family = UserAgentParser.UAPattern.FIRST_PATTERN.matcher(this.familyReplacement)
-                        .replaceFirst(Matcher.quoteReplacement(matcher.group(1)));
+                        .replaceFirst(Matcher.quoteReplacement(this.matcher.group(1)));
                 } else {
                     family = this.familyReplacement;
                 }
             } else if (groupCount >= 1) {
-                family = matcher.group(1);
+                family = this.matcher.group(1);
             }
             String v1 = null;
             if (this.v1Replacement != null) {
                 v1 = this.v1Replacement;
             } else if (groupCount >= 2) {
-                v1 = matcher.group(2);
+                v1 = this.matcher.group(2);
             }
             String v3 = null;
             String v2 = null;
             if (this.v2Replacement != null) {
                 v2 = this.v2Replacement;
             } else if (groupCount >= 3) {
-                v2 = matcher.group(3);
+                v2 = this.matcher.group(3);
                 if (groupCount >= 4) {
-                    v3 = matcher.group(4);
+                    v3 = this.matcher.group(4);
                 }
             }
             return family == null ? null : new UserAgent(family, v1, v2, v3);
