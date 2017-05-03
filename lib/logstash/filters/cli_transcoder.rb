@@ -40,13 +40,15 @@ java_filter.register
 puts 'missing'
 puts(Time.now.to_s)
 (1..lines.length).each do |n|
-  ruby_filter.lookup_useragent lines[n]
+#  ruby_filter.lookup_useragent lines[n]
 end
 
 puts(Time.now.to_s)
 
-(1..lines.length).each do |n|
-  java_filter.lookup_useragent lines[n]
+(1..10).each do
+  (1..lines.length).each do |n|
+    java_filter.lookup_useragent lines[n]
+  end
 end
 
 puts(Time.now.to_s)
@@ -56,7 +58,7 @@ puts 'hitting 10x'
 puts(Time.now.to_s)
 (1..lines.length).each do |n|
   (1..10).each do
-    ruby_filter.lookup_useragent lines[n]
+#    ruby_filter.lookup_useragent lines[n]
   end
 end
 

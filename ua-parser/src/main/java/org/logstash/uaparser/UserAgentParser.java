@@ -45,8 +45,8 @@ public class UserAgentParser {
         if (agentString == null) {
             return null;
         }
-        UserAgent agent;
         for (UserAgentParser.UAPattern p : this.patterns) {
+            UserAgent agent;
             if ((agent = p.match(agentString)) != null) {
                 return agent;
             }
@@ -55,40 +55,61 @@ public class UserAgentParser {
     }
 
     private static class UAPattern {
+
+        private static final Pattern FIRST_PATTERN = Pattern.compile("\\$1");
+
         private final Pattern pattern;
-        private final String familyReplacement, v1Replacement, v2Replacement;
+
+        private final Matcher matcher;
+
+        private final boolean familyContainsPos;
+
+        private final String familyReplacement;
+
+        private final String v1Replacement;
+
+        private final String v2Replacement;
 
         public UAPattern(Pattern pattern, String familyReplacement, String v1Replacement,
             String v2Replacement) {
             this.pattern = pattern;
+            this.matcher = this.pattern.matcher("");
             this.familyReplacement = familyReplacement;
             this.v1Replacement = v1Replacement;
             this.v2Replacement = v2Replacement;
+            if (this.familyReplacement == null) {
+                this.familyContainsPos = false;
+            } else {
+                this.familyContainsPos = this.familyReplacement.contains("$1");
+            }
         }
 
-        public UserAgent match(String agentString) {
-            String family = null, v1 = null, v2 = null, v3 = null;
-            Matcher matcher = this.pattern.matcher(agentString);
+        public UserAgent match(final CharSequence agentString) {
+            final Matcher matcher = this.matcher.reset(agentString);
             if (!matcher.find()) {
                 return null;
             }
-            int groupCount = matcher.groupCount();
+            final int groupCount = matcher.groupCount();
+            String family = null;
             if (this.familyReplacement != null) {
-                if (this.familyReplacement.contains("$1") && groupCount >= 1 &&
+                if (this.familyContainsPos && groupCount >= 1 &&
                     matcher.group(1) != null) {
-                    family = this.familyReplacement
-                        .replaceFirst("\\$1", Matcher.quoteReplacement(matcher.group(1)));
+                    family = UserAgentParser.UAPattern.FIRST_PATTERN.matcher(this.familyReplacement)
+                        .replaceFirst(Matcher.quoteReplacement(matcher.group(1)));
                 } else {
                     family = this.familyReplacement;
                 }
             } else if (groupCount >= 1) {
                 family = matcher.group(1);
             }
+            String v1 = null;
             if (this.v1Replacement != null) {
                 v1 = this.v1Replacement;
             } else if (groupCount >= 2) {
                 v1 = matcher.group(2);
             }
+            String v3 = null;
+            String v2 = null;
             if (this.v2Replacement != null) {
                 v2 = this.v2Replacement;
             } else if (groupCount >= 3) {

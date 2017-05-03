@@ -20,11 +20,17 @@ import java.util.Map;
 
 /**
  * User Agent parsed data class
- *
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
-public class UserAgent {
-    public final String family, major, minor, patch;
+public final class UserAgent {
+
+    public final String family;
+
+    public final String major;
+
+    public final String minor;
+
+    public final String patch;
 
     public UserAgent(String family, String major, String minor, String patch) {
         this.family = family;
