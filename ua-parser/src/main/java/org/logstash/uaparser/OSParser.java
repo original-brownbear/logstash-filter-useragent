@@ -26,7 +26,8 @@ import java.util.Map;
  * Operating System parser using ua-parser. Extracts OS information from user agent strings.
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
-public class OSParser {
+final class OSParser {
+
     private final List<OSParser.OSPattern> patterns;
 
     private OSParser(List<OSParser.OSPattern> patterns) {
@@ -54,7 +55,7 @@ public class OSParser {
         return new OS("Other", null, null, null, null);
     }
 
-    protected static OSParser.OSPattern patternFromMap(Map<String, String> configMap) {
+    private static OSParser.OSPattern patternFromMap(Map<String, String> configMap) {
         String regex = configMap.get("regex");
         if (regex == null) {
             throw new IllegalArgumentException("OS is missing regex");
@@ -68,12 +69,12 @@ public class OSParser {
         );
     }
 
-    protected static class OSPattern {
+    private static final class OSPattern {
 
         private static final Pattern FIRST_PATTERN =
             Pattern.compile("(" + Pattern.quote("$1") + ")");
 
-        private final Pattern pattern;
+        private final Matcher matcher;
 
         private final String osReplacement;
 
@@ -83,53 +84,53 @@ public class OSParser {
 
         private final String v3Replacement;
 
-        public OSPattern(Pattern pattern, String osReplacement, String v1Replacement,
+        OSPattern(Pattern pattern, String osReplacement, String v1Replacement,
             String v2Replacement, String v3Replacement) {
-            this.pattern = pattern;
+            this.matcher = pattern.matcher("");
             this.osReplacement = osReplacement;
             this.v1Replacement = v1Replacement;
             this.v2Replacement = v2Replacement;
             this.v3Replacement = v3Replacement;
         }
 
-        public OS match(String agentString) {
-            final Matcher matcher = this.pattern.matcher(agentString);
-            if (!matcher.find()) {
+        public OS match(final String agentString) {
+            this.matcher.reset(agentString);
+            if (!this.matcher.find()) {
                 return null;
             }
-            final int groupCount = matcher.groupCount();
+            final int groupCount = this.matcher.groupCount();
             String family = null;
             if (this.osReplacement != null) {
                 if (groupCount >= 1) {
                     family = OSParser.OSPattern.FIRST_PATTERN.matcher(this.osReplacement)
-                        .replaceAll(matcher.group(1));
+                        .replaceAll(this.matcher.group(1));
                 } else {
                     family = this.osReplacement;
                 }
             } else if (groupCount >= 1) {
-                family = matcher.group(1);
+                family = this.matcher.group(1);
             }
             String v1 = null;
             if (this.v1Replacement != null) {
                 v1 = this.v1Replacement;
             } else if (groupCount >= 2) {
-                v1 = matcher.group(2);
+                v1 = this.matcher.group(2);
             }
             String v2 = null;
             if (this.v2Replacement != null) {
                 v2 = this.v2Replacement;
             } else if (groupCount >= 3) {
-                v2 = matcher.group(3);
+                v2 = this.matcher.group(3);
             }
             String v3 = null;
             if (this.v3Replacement != null) {
                 v3 = this.v3Replacement;
             } else if (groupCount >= 4) {
-                v3 = matcher.group(4);
+                v3 = this.matcher.group(4);
             }
             String v4 = null;
             if (groupCount >= 5) {
-                v4 = matcher.group(5);
+                v4 = this.matcher.group(5);
             }
             return family == null ? null : new OS(family, v1, v2, v3, v4);
         }

@@ -20,11 +20,15 @@ import java.util.Map;
 
 /**
  * Operating System parsed data class
- *
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
 public class OS {
-    public final String family, major, minor, patch, patchMinor;
+
+    public final String family;
+    public final String major;
+    public final String minor;
+    public final String patch;
+    public final String patchMinor;
 
     public OS(String family, String major, String minor, String patch, String patchMinor) {
         this.family = family;

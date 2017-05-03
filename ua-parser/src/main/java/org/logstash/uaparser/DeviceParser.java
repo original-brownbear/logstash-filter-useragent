@@ -26,26 +26,9 @@ import java.util.regex.Pattern;
  * Device parser using ua-parser regexes. Extracts device information from user agent strings.
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
-public class DeviceParser {
-    List<DeviceParser.DevicePattern> patterns;
+final class DeviceParser {
 
-    public DeviceParser(List<DeviceParser.DevicePattern> patterns) {
-        this.patterns = patterns;
-    }
-
-    public Device parse(String agentString) {
-        if (agentString == null) {
-            return null;
-        }
-        String device = null;
-        for (DeviceParser.DevicePattern p : this.patterns) {
-            if ((device = p.match(agentString)) != null) {
-                break;
-            }
-        }
-        if (device == null) device = "Other";
-        return new Device(device);
-    }
+    private final List<DeviceParser.DevicePattern> patterns;
 
     public static DeviceParser fromList(List<Map<String, String>> configList) {
         List<DeviceParser.DevicePattern> configPatterns = new ArrayList<>();
@@ -55,8 +38,30 @@ public class DeviceParser {
         return new DeviceParser(configPatterns);
     }
 
-    protected static DeviceParser.DevicePattern patternFromMap(Map<String, String> configMap) {
-        String regex = configMap.get("regex");
+    /**
+     * Ctor.
+     * @param patterns Regex Patterns
+     */
+    private DeviceParser(List<DeviceParser.DevicePattern> patterns) {
+        this.patterns = patterns;
+    }
+
+    public Device parse(String agentString) {
+        if (agentString == null) {
+            return null;
+        }
+        String device = null;
+        for (final DeviceParser.DevicePattern p : this.patterns) {
+            if ((device = p.match(agentString)) != null) {
+                break;
+            }
+        }
+        if (device == null) device = "Other";
+        return new Device(device);
+    }
+
+    private static DeviceParser.DevicePattern patternFromMap(Map<String, String> configMap) {
+        final String regex = configMap.get("regex");
         if (regex == null) {
             throw new IllegalArgumentException("Device is missing regex");
         }
@@ -69,13 +74,12 @@ public class DeviceParser {
 
         private static final Pattern SUBSTITUTIONS_PATTERN = Pattern.compile("\\$\\d");
 
-        private final Pattern pattern;
         private final Matcher matcher;
+
         private final String deviceReplacement;
 
-        public DevicePattern(Pattern pattern, String deviceReplacement) {
-            this.pattern = pattern;
-            this.matcher = this.pattern.matcher("");
+        DevicePattern(Pattern pattern, String deviceReplacement) {
+            this.matcher = pattern.matcher("");
             this.deviceReplacement = deviceReplacement;
         }
 
@@ -91,7 +95,7 @@ public class DeviceParser {
                     for (String substitution : DevicePattern
                         .getSubstitutions(this.deviceReplacement)) {
                         int i = Integer.parseInt(substitution.substring(1));
-                        String replacement = this.matcher.groupCount() >= i &&
+                        final String replacement = this.matcher.groupCount() >= i &&
                             this.matcher.group(i) != null
                             ? Matcher.quoteReplacement(this.matcher.group(i)) : "";
                         device = device.replaceFirst('\\' + substitution, replacement);

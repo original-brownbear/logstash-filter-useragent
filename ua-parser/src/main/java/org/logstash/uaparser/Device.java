@@ -23,6 +23,7 @@ import java.util.Map;
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
 public class Device {
+
     public final String family;
 
     public Device(String family) {

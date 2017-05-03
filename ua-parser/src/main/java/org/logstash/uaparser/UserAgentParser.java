@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * User Agent parser using ua-parser regexes
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
-public final class UserAgentParser {
+final class UserAgentParser {
 
     private static final UserAgent OTHER = new UserAgent("Other", null, null, null);
 
@@ -70,11 +70,9 @@ public final class UserAgentParser {
         );
     }
 
-    private static class UAPattern {
+    private static final class UAPattern {
 
         private static final Pattern FIRST_PATTERN = Pattern.compile("\\$1");
-
-        private final Pattern pattern;
 
         private final Matcher matcher;
 
@@ -88,8 +86,7 @@ public final class UserAgentParser {
 
         UAPattern(final Pattern pattern, final String familyReplacement, final String v1Replacement,
             final String v2Replacement) {
-            this.pattern = pattern;
-            this.matcher = this.pattern.matcher("");
+            this.matcher = pattern.matcher("");
             this.familyReplacement = familyReplacement;
             this.v1Replacement = v1Replacement;
             this.v2Replacement = v2Replacement;
