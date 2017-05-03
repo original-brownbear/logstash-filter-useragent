@@ -26,32 +26,48 @@ import java.util.regex.Pattern;
  * User Agent parser using ua-parser regexes
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
-public class UserAgentParser {
+public final class UserAgentParser {
+
+    private static final UserAgent OTHER = new UserAgent("Other", null, null, null);
+
     private final List<UserAgentParser.UAPattern> patterns;
 
-    public UserAgentParser(List<UserAgentParser.UAPattern> patterns) {
+    public UserAgentParser(final List<UserAgentParser.UAPattern> patterns) {
         this.patterns = patterns;
     }
 
-    public static UserAgentParser fromList(List<Map<String, String>> configList) {
-        List<UserAgentParser.UAPattern> configPatterns = new ArrayList<>();
-        for (Map<String, String> configMap : configList) {
+    public static UserAgentParser fromList(final List<Map<String, String>> configList) {
+        final List<UserAgentParser.UAPattern> configPatterns = new ArrayList<>();
+        for (final Map<String, String> configMap : configList) {
             configPatterns.add(UserAgentParser.patternFromMap(configMap));
         }
         return new UserAgentParser(configPatterns);
     }
 
-    public UserAgent parse(String agentString) {
+    public UserAgent parse(final String agentString) {
         if (agentString == null) {
             return null;
         }
-        for (UserAgentParser.UAPattern p : this.patterns) {
-            UserAgent agent;
+        for (final UserAgentParser.UAPattern p : this.patterns) {
+            final UserAgent agent;
             if ((agent = p.match(agentString)) != null) {
                 return agent;
             }
         }
-        return new UserAgent("Other", null, null, null);
+        return UserAgentParser.OTHER;
+    }
+
+    private static UserAgentParser.UAPattern patternFromMap(final Map<String, String> configMap) {
+        final String regex = configMap.get("regex");
+        if (regex == null) {
+            throw new IllegalArgumentException("User agent is missing regex");
+        }
+        return new UserAgentParser.UAPattern(
+            Pattern.compile(regex),
+            configMap.get("family_replacement"),
+            configMap.get("v1_replacement"),
+            configMap.get("v2_replacement")
+        );
     }
 
     private static class UAPattern {
@@ -70,8 +86,8 @@ public class UserAgentParser {
 
         private final String v2Replacement;
 
-        public UAPattern(Pattern pattern, String familyReplacement, String v1Replacement,
-            String v2Replacement) {
+        UAPattern(final Pattern pattern, final String familyReplacement, final String v1Replacement,
+            final String v2Replacement) {
             this.pattern = pattern;
             this.matcher = this.pattern.matcher("");
             this.familyReplacement = familyReplacement;
@@ -120,18 +136,5 @@ public class UserAgentParser {
             }
             return family == null ? null : new UserAgent(family, v1, v2, v3);
         }
-    }
-
-    private static UserAgentParser.UAPattern patternFromMap(Map<String, String> configMap) {
-        String regex = configMap.get("regex");
-        if (regex == null) {
-            throw new IllegalArgumentException("User agent is missing regex");
-        }
-        return new UserAgentParser.UAPattern(
-            Pattern.compile(regex),
-            configMap.get("family_replacement"),
-            configMap.get("v1_replacement"),
-            configMap.get("v2_replacement")
-        );
     }
 }

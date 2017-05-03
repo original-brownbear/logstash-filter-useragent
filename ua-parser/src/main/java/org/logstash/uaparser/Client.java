@@ -21,21 +21,24 @@ package org.logstash.uaparser;
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
 public final class Client {
+
     public final UserAgent userAgent;
+
     public final OS os;
+
     public final Device device;
 
-    public Client(UserAgent userAgent, OS os, Device device) {
+    public Client(final UserAgent userAgent, final OS os, final Device device) {
         this.userAgent = userAgent;
         this.os = os;
         this.device = device;
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
         if (other == this) return true;
         if (!(other instanceof Client)) return false;
-        Client o = (Client) other;
+        final Client o = (Client) other;
         return ((this.userAgent != null && this.userAgent.equals(o.userAgent)) ||
             this.userAgent == o.userAgent) &&
             ((this.os != null && this.os.equals(o.os)) || this.os == o.os) &&

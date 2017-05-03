@@ -38,7 +38,7 @@ public class DeviceParser {
             return null;
         }
         String device = null;
-        for (DeviceParser.DevicePattern p : patterns) {
+        for (DeviceParser.DevicePattern p : this.patterns) {
             if ((device = p.match(agentString)) != null) {
                 break;
             }
@@ -65,42 +65,48 @@ public class DeviceParser {
         return new DeviceParser.DevicePattern(pattern, configMap.get("device_replacement"));
     }
 
-    protected static class DevicePattern {
+    private static final class DevicePattern {
+
         private static final Pattern SUBSTITUTIONS_PATTERN = Pattern.compile("\\$\\d");
+
         private final Pattern pattern;
+        private final Matcher matcher;
         private final String deviceReplacement;
 
         public DevicePattern(Pattern pattern, String deviceReplacement) {
             this.pattern = pattern;
+            this.matcher = this.pattern.matcher("");
             this.deviceReplacement = deviceReplacement;
         }
 
         public String match(String agentString) {
-            Matcher matcher = this.pattern.matcher(agentString);
-            if (!matcher.find()) {
+            this.matcher.reset(agentString);
+            if (!this.matcher.find()) {
                 return null;
             }
             String device = null;
             if (this.deviceReplacement != null) {
                 if (this.deviceReplacement.contains("$")) {
                     device = this.deviceReplacement;
-                    for (String substitution : getSubstitutions(this.deviceReplacement)) {
+                    for (String substitution : DevicePattern
+                        .getSubstitutions(this.deviceReplacement)) {
                         int i = Integer.parseInt(substitution.substring(1));
-                        String replacement = matcher.groupCount() >= i && matcher.group(i) != null
-                            ? Matcher.quoteReplacement(matcher.group(i)) : "";
-                        device = device.replaceFirst("\\" + substitution, replacement);
+                        String replacement = this.matcher.groupCount() >= i &&
+                            this.matcher.group(i) != null
+                            ? Matcher.quoteReplacement(this.matcher.group(i)) : "";
+                        device = device.replaceFirst('\\' + substitution, replacement);
                     }
                     device = device.trim();
                 } else {
                     device = this.deviceReplacement;
                 }
-            } else if (matcher.groupCount() >= 1) {
-                device = matcher.group(1);
+            } else if (this.matcher.groupCount() >= 1) {
+                device = this.matcher.group(1);
             }
             return device;
         }
 
-        private List<String> getSubstitutions(String deviceReplacement) {
+        private static Iterable<String> getSubstitutions(String deviceReplacement) {
             Matcher matcher =
                 DeviceParser.DevicePattern.SUBSTITUTIONS_PATTERN.matcher(deviceReplacement);
             List<String> substitutions = new ArrayList<>();
